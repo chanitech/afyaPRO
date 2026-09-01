@@ -1,7 +1,50 @@
 <?php
 
+use App\Livewire\Appointments\Create as AppointmentsCreate;
+use App\Livewire\Appointments\Index as AppointmentsIndex;
+use App\Livewire\Billing\Create as BillingCreate;
+use App\Livewire\Billing\Pending as BillingPending;
+use App\Livewire\Billing\Show as BillingShow;
+use App\Livewire\Opd\Consultation;
+use App\Livewire\Patients\Create as PatientsCreate;
+use App\Livewire\Patients\Index as PatientsIndex;
+use App\Livewire\Queue\Board as QueueBoard;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', function () {
-    return view('welcome');
+Route::view('/', 'welcome');
+
+Route::view('dashboard', 'dashboard')
+    ->middleware(['auth', 'verified'])
+    ->name('dashboard');
+
+Route::view('profile', 'profile')
+    ->middleware(['auth'])
+    ->name('profile');
+
+Route::middleware(['auth', 'verified'])->group(function () {
+    Route::middleware('permission:patients.manage')->group(function () {
+        Route::get('patients', PatientsIndex::class)->name('patients.index');
+        Route::get('patients/create', PatientsCreate::class)->name('patients.create');
+    });
+
+    Route::middleware('permission:appointments.manage')->group(function () {
+        Route::get('appointments', AppointmentsIndex::class)->name('appointments.index');
+        Route::get('appointments/create', AppointmentsCreate::class)->name('appointments.create');
+    });
+
+    Route::middleware('permission:queue.manage')->group(function () {
+        Route::get('queue', QueueBoard::class)->name('queue.board');
+    });
+
+    Route::middleware('permission:opd.manage')->group(function () {
+        Route::get('opd/consultation', Consultation::class)->name('opd.consultation');
+    });
+
+    Route::middleware('permission:billing.manage')->group(function () {
+        Route::get('billing', BillingPending::class)->name('billing.pending');
+        Route::get('billing/visits/{visit}/create', BillingCreate::class)->name('billing.create');
+        Route::get('billing/invoices/{invoice}', BillingShow::class)->name('billing.show');
+    });
 });
+
+require __DIR__.'/auth.php';
