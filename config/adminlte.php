@@ -286,6 +286,13 @@ return [
             'active' => ['diagnostics*'],
         ],
         [
+            'text' => 'Pharmacy',
+            'route' => 'pharmacy.pending',
+            'icon' => 'bi bi-capsule',
+            'can' => 'pharmacy.manage',
+            'active' => ['pharmacy*'],
+        ],
+        [
             'text' => 'Billing',
             'route' => 'billing.pending',
             'icon' => 'bi bi-receipt',

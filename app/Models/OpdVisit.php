@@ -57,4 +57,9 @@ class OpdVisit extends Model
     {
         return $this->hasMany(DiagnosticOrder::class);
     }
+
+    public function prescriptions(): HasMany
+    {
+        return $this->hasMany(Prescription::class);
+    }
 }

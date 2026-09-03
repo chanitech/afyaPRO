@@ -47,6 +47,9 @@
                         <a href="{{ route('diagnostics.order', ['visit' => $activeVisit->id]) }}" wire:navigate class="btn btn-outline-primary btn-sm">
                             <i class="bi bi-clipboard2-pulse"></i> Order Tests
                         </a>
+                        <a href="{{ route('pharmacy.prescribe', ['visit' => $activeVisit->id]) }}" wire:navigate class="btn btn-outline-primary btn-sm">
+                            <i class="bi bi-capsule"></i> Prescribe
+                        </a>
                     </x-slot>
 
                     @if ($activeVisit->diagnosticOrders->isNotEmpty())
@@ -59,6 +62,26 @@
                                             <span>{{ $item->test->name }}</span>
                                             @if ($item->status === 'completed')
                                                 <span class="badge text-bg-success">{{ $item->result_value }}</span>
+                                            @else
+                                                <span class="badge text-bg-secondary">Pending</span>
+                                            @endif
+                                        </li>
+                                    @endforeach
+                                @endforeach
+                            </ul>
+                        </div>
+                    @endif
+
+                    @if ($activeVisit->prescriptions->isNotEmpty())
+                        <div class="mb-3">
+                            <h6 class="text-uppercase text-muted small mb-2">Prescriptions</h6>
+                            <ul class="list-group list-group-flush">
+                                @foreach ($activeVisit->prescriptions as $prescription)
+                                    @foreach ($prescription->items as $item)
+                                        <li class="list-group-item d-flex align-items-center justify-content-between px-0">
+                                            <span>{{ $item->drug->name }} &times;{{ $item->quantity }}</span>
+                                            @if ($item->status === 'dispensed')
+                                                <span class="badge text-bg-success">Dispensed</span>
                                             @else
                                                 <span class="badge text-bg-secondary">Pending</span>
                                             @endif

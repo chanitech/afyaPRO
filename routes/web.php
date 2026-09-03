@@ -11,6 +11,10 @@ use App\Livewire\Diagnostics\Show as DiagnosticsShow;
 use App\Livewire\Opd\Consultation;
 use App\Livewire\Patients\Create as PatientsCreate;
 use App\Livewire\Patients\Index as PatientsIndex;
+use App\Livewire\Pharmacy\Drugs as PharmacyDrugs;
+use App\Livewire\Pharmacy\Pending as PharmacyPending;
+use App\Livewire\Pharmacy\Prescribe as PharmacyPrescribe;
+use App\Livewire\Pharmacy\Show as PharmacyShow;
 use App\Livewire\Queue\Board as QueueBoard;
 use Illuminate\Support\Facades\Route;
 
@@ -53,6 +57,13 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('diagnostics', DiagnosticsPending::class)->name('diagnostics.pending');
         Route::get('diagnostics/visits/{visit}/order', DiagnosticsOrder::class)->name('diagnostics.order');
         Route::get('diagnostics/orders/{order}', DiagnosticsShow::class)->name('diagnostics.show');
+    });
+
+    Route::middleware('permission:pharmacy.manage')->group(function () {
+        Route::get('pharmacy', PharmacyPending::class)->name('pharmacy.pending');
+        Route::get('pharmacy/drugs', PharmacyDrugs::class)->name('pharmacy.drugs');
+        Route::get('pharmacy/visits/{visit}/prescribe', PharmacyPrescribe::class)->name('pharmacy.prescribe');
+        Route::get('pharmacy/prescriptions/{prescription}', PharmacyShow::class)->name('pharmacy.show');
     });
 });
 

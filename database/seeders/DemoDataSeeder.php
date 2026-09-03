@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use App\Models\Department;
 use App\Models\DiagnosticTest;
+use App\Models\Drug;
 use App\Models\Facility;
 use App\Models\Patient;
 use App\Models\User;
@@ -72,6 +73,18 @@ class DemoDataSeeder extends Seeder
         );
         $receptionist->syncRoles(['receptionist']);
 
+        $pharmacist = User::firstOrCreate(
+            ['email' => 'pharmacist@afyapro.test'],
+            [
+                'name' => 'Baraka Mnyika',
+                'facility_id' => $facility->id,
+                'phone' => '+255700000004',
+                'password' => Hash::make('password'),
+                'email_verified_at' => now(),
+            ]
+        );
+        $pharmacist->syncRoles(['pharmacist']);
+
         if (Patient::where('facility_id', $facility->id)->count() === 0) {
             Patient::factory()
                 ->count(5)
@@ -96,6 +109,32 @@ class DemoDataSeeder extends Seeder
             );
         }
 
-        $this->command?->info("Demo facility '{$facility->name}' seeded with department '{$generalOpd->name}', 3 staff users, 5 patients, and ".count($tests).' diagnostic tests.');
+        $drugs = [
+            ['name' => 'Paracetamol 500mg', 'generic_name' => 'Paracetamol', 'form' => 'tablet', 'unit' => 'tablet', 'price' => 100, 'stock' => 2000, 'reorder' => 200],
+            ['name' => 'Amoxicillin 500mg', 'generic_name' => 'Amoxicillin', 'form' => 'capsule', 'unit' => 'capsule', 'price' => 300, 'stock' => 800, 'reorder' => 100],
+            ['name' => 'Artemether/Lumefantrine (ALU)', 'generic_name' => 'Artemether/Lumefantrine', 'form' => 'tablet', 'unit' => 'course', 'price' => 3500, 'stock' => 150, 'reorder' => 30],
+            ['name' => 'Oral Rehydration Salts (ORS)', 'generic_name' => 'ORS', 'form' => 'sachet', 'unit' => 'sachet', 'price' => 500, 'stock' => 300, 'reorder' => 50],
+            ['name' => 'Diclofenac 50mg', 'generic_name' => 'Diclofenac', 'form' => 'tablet', 'unit' => 'tablet', 'price' => 150, 'stock' => 600, 'reorder' => 100],
+            ['name' => 'Metronidazole 400mg', 'generic_name' => 'Metronidazole', 'form' => 'tablet', 'unit' => 'tablet', 'price' => 120, 'stock' => 500, 'reorder' => 80],
+            ['name' => 'Amlodipine 5mg', 'generic_name' => 'Amlodipine', 'form' => 'tablet', 'unit' => 'tablet', 'price' => 200, 'stock' => 400, 'reorder' => 60],
+            ['name' => 'IV Normal Saline 500ml', 'generic_name' => 'Sodium Chloride 0.9%', 'form' => 'infusion', 'unit' => 'bottle', 'price' => 4000, 'stock' => 100, 'reorder' => 20],
+        ];
+
+        foreach ($drugs as $drug) {
+            Drug::firstOrCreate(
+                ['facility_id' => $facility->id, 'name' => $drug['name']],
+                [
+                    'generic_name' => $drug['generic_name'],
+                    'form' => $drug['form'],
+                    'unit' => $drug['unit'],
+                    'unit_price' => $drug['price'],
+                    'quantity_on_hand' => $drug['stock'],
+                    'reorder_level' => $drug['reorder'],
+                    'is_active' => true,
+                ]
+            );
+        }
+
+        $this->command?->info("Demo facility '{$facility->name}' seeded with department '{$generalOpd->name}', 4 staff users, 5 patients, ".count($tests).' diagnostic tests, and '.count($drugs).' drugs.');
     }
 }
