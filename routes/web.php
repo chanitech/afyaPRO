@@ -11,7 +11,7 @@ use App\Livewire\Patients\Index as PatientsIndex;
 use App\Livewire\Queue\Board as QueueBoard;
 use Illuminate\Support\Facades\Route;
 
-Route::view('/', 'welcome');
+Route::get('/', fn () => auth()->check() ? redirect()->route('dashboard') : redirect()->route('login'));
 
 Route::view('dashboard', 'dashboard')
     ->middleware(['auth', 'verified'])
