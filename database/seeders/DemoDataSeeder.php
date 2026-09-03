@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\Department;
+use App\Models\DiagnosticTest;
 use App\Models\Facility;
 use App\Models\Patient;
 use App\Models\User;
@@ -77,6 +78,24 @@ class DemoDataSeeder extends Seeder
                 ->create(['facility_id' => $facility->id, 'registered_by' => $receptionist->id]);
         }
 
-        $this->command?->info("Demo facility '{$facility->name}' seeded with department '{$generalOpd->name}', 3 staff users, and 5 patients.");
+        $tests = [
+            ['category' => 'lab', 'name' => 'Complete Blood Count (CBC)', 'code' => 'CBC', 'price' => 8000],
+            ['category' => 'lab', 'name' => 'Malaria Rapid Diagnostic Test', 'code' => 'MRDT', 'price' => 5000],
+            ['category' => 'lab', 'name' => 'Urinalysis', 'code' => 'UA', 'price' => 4000],
+            ['category' => 'lab', 'name' => 'Blood Grouping & Rh Factor', 'code' => 'BG', 'price' => 6000],
+            ['category' => 'lab', 'name' => 'HIV Rapid Test', 'code' => 'HIV', 'price' => 3000],
+            ['category' => 'lab', 'name' => 'Fasting Blood Glucose', 'code' => 'FBG', 'price' => 4000],
+            ['category' => 'radiology', 'name' => 'Chest X-Ray', 'code' => 'CXR', 'price' => 15000],
+            ['category' => 'radiology', 'name' => 'Abdominal Ultrasound', 'code' => 'USS-ABD', 'price' => 25000],
+        ];
+
+        foreach ($tests as $test) {
+            DiagnosticTest::firstOrCreate(
+                ['facility_id' => $facility->id, 'name' => $test['name']],
+                ['category' => $test['category'], 'code' => $test['code'], 'price' => $test['price'], 'is_active' => true]
+            );
+        }
+
+        $this->command?->info("Demo facility '{$facility->name}' seeded with department '{$generalOpd->name}', 3 staff users, 5 patients, and ".count($tests).' diagnostic tests.');
     }
 }

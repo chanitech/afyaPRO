@@ -279,6 +279,13 @@ return [
             'can' => 'opd.manage',
         ],
         [
+            'text' => 'Diagnostics',
+            'route' => 'diagnostics.pending',
+            'icon' => 'bi bi-clipboard2-pulse',
+            'can' => 'diagnostics.manage',
+            'active' => ['diagnostics*'],
+        ],
+        [
             'text' => 'Billing',
             'route' => 'billing.pending',
             'icon' => 'bi bi-receipt',

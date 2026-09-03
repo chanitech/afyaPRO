@@ -51,20 +51,36 @@ class Consultation extends Component
     {
         $ticket = QueueTicket::where('department_id', $this->departmentId)->findOrFail($ticketId);
 
-        $visit = OpdVisit::create([
-            'facility_id' => $ticket->facility_id,
-            'department_id' => $ticket->department_id,
-            'patient_id' => $ticket->patient_id,
-            'doctor_id' => Auth::id(),
-            'appointment_id' => $ticket->appointment_id,
-            'status' => 'in_progress',
-            'started_at' => now(),
-        ]);
+        // Reuse an already-open visit for this patient (e.g. the doctor navigated
+        // away to order tests and came back) instead of creating a duplicate.
+        $visit = OpdVisit::where('patient_id', $ticket->patient_id)
+            ->where('department_id', $ticket->department_id)
+            ->where('status', 'in_progress')
+            ->latest('started_at')
+            ->first();
 
-        $ticket->update(['status' => 'in_service', 'started_at' => now()]);
+        if (! $visit) {
+            $visit = OpdVisit::create([
+                'facility_id' => $ticket->facility_id,
+                'department_id' => $ticket->department_id,
+                'patient_id' => $ticket->patient_id,
+                'doctor_id' => Auth::id(),
+                'appointment_id' => $ticket->appointment_id,
+                'status' => 'in_progress',
+                'started_at' => now(),
+            ]);
+        }
+
+        $ticket->update(['status' => 'in_service', 'started_at' => $ticket->started_at ?? now()]);
 
         $this->activeVisitId = $visit->id;
-        $this->reset(['chief_complaint', 'temperature', 'blood_pressure', 'pulse', 'weight', 'diagnosis', 'notes']);
+        $this->chief_complaint = (string) $visit->chief_complaint;
+        $this->temperature = (string) ($visit->vitals['temperature'] ?? '');
+        $this->blood_pressure = (string) ($visit->vitals['blood_pressure'] ?? '');
+        $this->pulse = (string) ($visit->vitals['pulse'] ?? '');
+        $this->weight = (string) ($visit->vitals['weight'] ?? '');
+        $this->diagnosis = (string) $visit->diagnosis;
+        $this->notes = (string) $visit->notes;
     }
 
     public function complete()
@@ -115,7 +131,9 @@ class Consultation extends Component
 
         $departments = Department::where('facility_id', Auth::user()->facility_id)->orderBy('name')->get();
 
-        $activeVisit = $this->activeVisitId ? OpdVisit::with('patient')->find($this->activeVisitId) : null;
+        $activeVisit = $this->activeVisitId
+            ? OpdVisit::with(['patient', 'diagnosticOrders.items.test'])->find($this->activeVisitId)
+            : null;
 
         return view('livewire.opd.consultation', compact('inService', 'departments', 'activeVisit'));
     }

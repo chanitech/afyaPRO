@@ -56,6 +56,11 @@ class Patient extends Model
         return $this->hasMany(Invoice::class);
     }
 
+    public function diagnosticOrders(): HasMany
+    {
+        return $this->hasMany(DiagnosticOrder::class);
+    }
+
     public function fullName(): string
     {
         return trim("{$this->first_name} {$this->last_name}");

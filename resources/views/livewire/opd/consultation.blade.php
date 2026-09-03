@@ -24,10 +24,12 @@
                                 <span class="fw-semibold">#{{ $ticket->ticket_number }}</span>
                                 <span class="ms-2 small">{{ $ticket->patient->fullName() }}</span>
                             </div>
-                            @if ($ticket->status === 'called')
+                            @if ($activeVisit && $activeVisit->patient_id === $ticket->patient_id)
+                                <span class="badge text-bg-primary">Open</span>
+                            @elseif ($ticket->status === 'called')
                                 <button wire:click="start({{ $ticket->id }})" class="btn btn-outline-primary btn-sm">Start</button>
                             @else
-                                <span class="badge text-bg-info">In progress</span>
+                                <button wire:click="start({{ $ticket->id }})" class="btn btn-outline-secondary btn-sm">Resume</button>
                             @endif
                         </li>
                     @empty
@@ -41,6 +43,32 @@
             @if ($activeVisit)
                 <x-adminlte-card icon="bi bi-heart-pulse"
                     title="Consultation — {{ $activeVisit->patient->fullName() }} ({{ $activeVisit->patient->patient_number }})">
+                    <x-slot name="tools">
+                        <a href="{{ route('diagnostics.order', ['visit' => $activeVisit->id]) }}" wire:navigate class="btn btn-outline-primary btn-sm">
+                            <i class="bi bi-clipboard2-pulse"></i> Order Tests
+                        </a>
+                    </x-slot>
+
+                    @if ($activeVisit->diagnosticOrders->isNotEmpty())
+                        <div class="mb-3">
+                            <h6 class="text-uppercase text-muted small mb-2">Ordered Tests</h6>
+                            <ul class="list-group list-group-flush">
+                                @foreach ($activeVisit->diagnosticOrders as $diagnosticOrder)
+                                    @foreach ($diagnosticOrder->items as $item)
+                                        <li class="list-group-item d-flex align-items-center justify-content-between px-0">
+                                            <span>{{ $item->test->name }}</span>
+                                            @if ($item->status === 'completed')
+                                                <span class="badge text-bg-success">{{ $item->result_value }}</span>
+                                            @else
+                                                <span class="badge text-bg-secondary">Pending</span>
+                                            @endif
+                                        </li>
+                                    @endforeach
+                                @endforeach
+                            </ul>
+                        </div>
+                    @endif
+
                     <form wire:submit="complete">
                         <div class="mb-3">
                             <x-input-label for="chief_complaint" value="Chief complaint" />

@@ -5,6 +5,9 @@ use App\Livewire\Appointments\Index as AppointmentsIndex;
 use App\Livewire\Billing\Create as BillingCreate;
 use App\Livewire\Billing\Pending as BillingPending;
 use App\Livewire\Billing\Show as BillingShow;
+use App\Livewire\Diagnostics\Order as DiagnosticsOrder;
+use App\Livewire\Diagnostics\Pending as DiagnosticsPending;
+use App\Livewire\Diagnostics\Show as DiagnosticsShow;
 use App\Livewire\Opd\Consultation;
 use App\Livewire\Patients\Create as PatientsCreate;
 use App\Livewire\Patients\Index as PatientsIndex;
@@ -44,6 +47,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('billing', BillingPending::class)->name('billing.pending');
         Route::get('billing/visits/{visit}/create', BillingCreate::class)->name('billing.create');
         Route::get('billing/invoices/{invoice}', BillingShow::class)->name('billing.show');
+    });
+
+    Route::middleware('permission:diagnostics.manage')->group(function () {
+        Route::get('diagnostics', DiagnosticsPending::class)->name('diagnostics.pending');
+        Route::get('diagnostics/visits/{visit}/order', DiagnosticsOrder::class)->name('diagnostics.order');
+        Route::get('diagnostics/orders/{order}', DiagnosticsShow::class)->name('diagnostics.show');
     });
 });
 
