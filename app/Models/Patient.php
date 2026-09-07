@@ -66,6 +66,11 @@ class Patient extends Model
         return $this->hasMany(Prescription::class);
     }
 
+    public function admissions(): HasMany
+    {
+        return $this->hasMany(Admission::class);
+    }
+
     public function fullName(): string
     {
         return trim("{$this->first_name} {$this->last_name}");

@@ -62,4 +62,9 @@ class OpdVisit extends Model
     {
         return $this->hasMany(Prescription::class);
     }
+
+    public function admission(): HasOne
+    {
+        return $this->hasOne(Admission::class);
+    }
 }

@@ -50,7 +50,26 @@
                         <a href="{{ route('pharmacy.prescribe', ['visit' => $activeVisit->id]) }}" wire:navigate class="btn btn-outline-primary btn-sm">
                             <i class="bi bi-capsule"></i> Prescribe
                         </a>
+                        @if (! $activeVisit->admission)
+                            <a href="{{ route('inpatient.admit', ['visit' => $activeVisit->id]) }}" wire:navigate class="btn btn-outline-primary btn-sm">
+                                <i class="bi bi-hospital"></i> Admit to Ward
+                            </a>
+                        @endif
                     </x-slot>
+
+                    @if ($activeVisit->admission)
+                        <div class="alert alert-info d-flex align-items-center justify-content-between mb-3">
+                            <span>
+                                <i class="bi bi-hospital me-1"></i>
+                                Admitted to {{ $activeVisit->admission->ward->name }}, Bed {{ $activeVisit->admission->bed->bed_number }}
+                            </span>
+                            @if ($activeVisit->admission->status === 'discharged')
+                                <span class="badge text-bg-secondary">Discharged</span>
+                            @else
+                                <span class="badge text-bg-success">Admitted</span>
+                            @endif
+                        </div>
+                    @endif
 
                     @if ($activeVisit->diagnosticOrders->isNotEmpty())
                         <div class="mb-3">

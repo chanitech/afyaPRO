@@ -293,6 +293,13 @@ return [
             'active' => ['pharmacy*'],
         ],
         [
+            'text' => 'Inpatient Ward',
+            'route' => 'inpatient.board',
+            'icon' => 'bi bi-hospital',
+            'can' => 'inpatient.manage',
+            'active' => ['inpatient*'],
+        ],
+        [
             'text' => 'Billing',
             'route' => 'billing.pending',
             'icon' => 'bi bi-receipt',

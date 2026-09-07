@@ -8,6 +8,9 @@ use App\Livewire\Billing\Show as BillingShow;
 use App\Livewire\Diagnostics\Order as DiagnosticsOrder;
 use App\Livewire\Diagnostics\Pending as DiagnosticsPending;
 use App\Livewire\Diagnostics\Show as DiagnosticsShow;
+use App\Livewire\Inpatient\Admit as InpatientAdmit;
+use App\Livewire\Inpatient\Board as InpatientBoard;
+use App\Livewire\Inpatient\Wards as InpatientWards;
 use App\Livewire\Opd\Consultation;
 use App\Livewire\Patients\Create as PatientsCreate;
 use App\Livewire\Patients\Index as PatientsIndex;
@@ -64,6 +67,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('pharmacy/drugs', PharmacyDrugs::class)->name('pharmacy.drugs');
         Route::get('pharmacy/visits/{visit}/prescribe', PharmacyPrescribe::class)->name('pharmacy.prescribe');
         Route::get('pharmacy/prescriptions/{prescription}', PharmacyShow::class)->name('pharmacy.show');
+    });
+
+    Route::middleware('permission:inpatient.manage')->group(function () {
+        Route::get('inpatient', InpatientBoard::class)->name('inpatient.board');
+        Route::get('inpatient/wards', InpatientWards::class)->name('inpatient.wards');
+        Route::get('inpatient/visits/{visit}/admit', InpatientAdmit::class)->name('inpatient.admit');
     });
 });
 

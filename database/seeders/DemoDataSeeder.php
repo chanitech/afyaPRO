@@ -2,12 +2,14 @@
 
 namespace Database\Seeders;
 
+use App\Models\Bed;
 use App\Models\Department;
 use App\Models\DiagnosticTest;
 use App\Models\Drug;
 use App\Models\Facility;
 use App\Models\Patient;
 use App\Models\User;
+use App\Models\Ward;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
 
@@ -85,6 +87,18 @@ class DemoDataSeeder extends Seeder
         );
         $pharmacist->syncRoles(['pharmacist']);
 
+        $nurse = User::firstOrCreate(
+            ['email' => 'nurse@afyapro.test'],
+            [
+                'name' => 'Faraja Kessy',
+                'facility_id' => $facility->id,
+                'phone' => '+255700000005',
+                'password' => Hash::make('password'),
+                'email_verified_at' => now(),
+            ]
+        );
+        $nurse->syncRoles(['nurse']);
+
         if (Patient::where('facility_id', $facility->id)->count() === 0) {
             Patient::factory()
                 ->count(5)
@@ -135,6 +149,26 @@ class DemoDataSeeder extends Seeder
             );
         }
 
-        $this->command?->info("Demo facility '{$facility->name}' seeded with department '{$generalOpd->name}', 4 staff users, 5 patients, ".count($tests).' diagnostic tests, and '.count($drugs).' drugs.');
+        $wards = [
+            ['name' => 'General Medical Ward', 'code' => 'GMW', 'type' => 'general', 'beds' => 6],
+            ['name' => 'Maternity Ward', 'code' => 'MAT', 'type' => 'maternity', 'beds' => 4],
+            ['name' => 'Intensive Care Unit', 'code' => 'ICU', 'type' => 'icu', 'beds' => 2],
+        ];
+
+        foreach ($wards as $wardData) {
+            $ward = Ward::firstOrCreate(
+                ['facility_id' => $facility->id, 'code' => $wardData['code']],
+                ['name' => $wardData['name'], 'ward_type' => $wardData['type']]
+            );
+
+            for ($i = 1; $i <= $wardData['beds']; $i++) {
+                Bed::firstOrCreate(
+                    ['ward_id' => $ward->id, 'bed_number' => (string) $i],
+                    ['facility_id' => $facility->id, 'status' => 'available']
+                );
+            }
+        }
+
+        $this->command?->info("Demo facility '{$facility->name}' seeded with department '{$generalOpd->name}', 5 staff users, 5 patients, ".count($tests).' diagnostic tests, '.count($drugs).' drugs, and '.count($wards).' wards.');
     }
 }
