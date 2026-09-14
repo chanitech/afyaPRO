@@ -29,6 +29,10 @@
                             <td>{{ $patient->phone }}</td>
                             <td class="text-end">
                                 <a href="{{ route('appointments.create', ['patient' => $patient->id]) }}" wire:navigate>Book appointment</a>
+                                <span class="text-muted mx-1">&middot;</span>
+                                <a href="{{ route('patients.id-card', ['patient' => $patient->id]) }}" target="_blank">ID Card</a>
+                                <span class="text-muted mx-1">&middot;</span>
+                                <a href="{{ route('patients.wristband', ['patient' => $patient->id]) }}" target="_blank">Wristband</a>
                             </td>
                         </tr>
                     @empty

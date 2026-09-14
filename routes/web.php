@@ -15,7 +15,9 @@ use App\Livewire\Insurance\Index as InsuranceIndex;
 use App\Livewire\Insurance\Show as InsuranceShow;
 use App\Livewire\Opd\Consultation;
 use App\Livewire\Patients\Create as PatientsCreate;
+use App\Livewire\Patients\IdCard as PatientsIdCard;
 use App\Livewire\Patients\Index as PatientsIndex;
+use App\Livewire\Patients\Wristband as PatientsWristband;
 use App\Livewire\Pharmacy\Drugs as PharmacyDrugs;
 use App\Livewire\Pharmacy\Pending as PharmacyPending;
 use App\Livewire\Pharmacy\Prescribe as PharmacyPrescribe;
@@ -37,6 +39,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::middleware('permission:patients.manage')->group(function () {
         Route::get('patients', PatientsIndex::class)->name('patients.index');
         Route::get('patients/create', PatientsCreate::class)->name('patients.create');
+        Route::get('patients/{patient}/id-card', PatientsIdCard::class)->name('patients.id-card');
+        Route::get('patients/{patient}/wristband', PatientsWristband::class)->name('patients.wristband');
     });
 
     Route::middleware('permission:appointments.manage')->group(function () {
