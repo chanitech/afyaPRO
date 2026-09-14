@@ -25,6 +25,7 @@ class PatientFactory extends Factory
             'email' => fake()->optional()->safeEmail(),
             'national_id' => fake()->optional()->numerify('##############-##'),
             'nhif_card_number' => fake()->optional()->numerify('##########'),
+            'nssf_member_number' => fake()->optional()->bothify('NSSF-#####??'),
             'address' => fake()->address(),
         ];
     }

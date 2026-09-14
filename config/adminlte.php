@@ -314,7 +314,7 @@ return [
             'active' => ['billing*'],
         ],
         [
-            'text' => 'NHIF Claims',
+            'text' => 'Insurance Claims',
             'route' => 'insurance.index',
             'icon' => 'bi bi-shield-check',
             'can' => 'insurance.manage',

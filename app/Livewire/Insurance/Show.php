@@ -3,7 +3,7 @@
 namespace App\Livewire\Insurance;
 
 use App\Models\InsuranceClaim;
-use App\Support\Nhif\NhifGateway;
+use App\Support\Insurance\InsuranceGateway;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\Validate;
 use Livewire\Component;
@@ -26,7 +26,7 @@ class Show extends Component
 
     public function checkEligibility(): void
     {
-        $result = app(NhifGateway::class)->checkEligibility($this->claim->nhif_card_number);
+        $result = app(InsuranceGateway::class)->checkEligibility($this->claim->insurer, $this->claim->member_number);
 
         $this->claim->update([
             'status' => $result->eligible ? 'eligible' : 'not_eligible',
@@ -42,9 +42,10 @@ class Show extends Component
             return;
         }
 
-        app(NhifGateway::class)->submitClaim(
+        app(InsuranceGateway::class)->submitClaim(
+            $this->claim->insurer,
             $this->claim->claim_number,
-            $this->claim->nhif_card_number,
+            $this->claim->member_number,
             (float) $this->claim->amount_claimed,
         );
 

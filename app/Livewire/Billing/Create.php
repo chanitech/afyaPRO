@@ -24,20 +24,28 @@ class Create extends Component
     #[Validate('numeric|min:0')]
     public string $amountReceived = '0';
 
-    #[Validate('in:cash,insurance')]
+    #[Validate('in:cash,nhif,nssf')]
     public string $payer = 'cash';
 
     #[Validate('nullable|string|max:30')]
-    public string $nhifCardNumber = '';
+    public string $memberNumber = '';
 
     public function mount(OpdVisit $visit): void
     {
         $this->visit = $visit->loadMissing('patient');
-        $this->nhifCardNumber = $this->visit->patient->nhif_card_number ?? '';
 
         if ($this->visit->invoice) {
             $this->redirect(route('billing.show', ['invoice' => $this->visit->invoice->id]), navigate: true);
         }
+    }
+
+    public function updatedPayer(): void
+    {
+        $this->memberNumber = match ($this->payer) {
+            'nhif' => $this->visit->patient->nhif_card_number ?? '',
+            'nssf' => $this->visit->patient->nssf_member_number ?? '',
+            default => '',
+        };
     }
 
     public function addItem(): void
@@ -69,11 +77,13 @@ class Create extends Component
             'items.*.unit_price' => 'required|numeric|min:0',
             'discount' => 'numeric|min:0',
             'amountReceived' => 'numeric|min:0',
-            'payer' => 'in:cash,insurance',
-            'nhifCardNumber' => $this->payer === 'insurance' ? 'required|string|max:30' : 'nullable|string|max:30',
+            'payer' => 'in:cash,nhif,nssf',
+            'memberNumber' => $this->payer !== 'cash' ? 'required|string|max:30' : 'nullable|string|max:30',
         ]);
 
-        [$invoice, $claim] = DB::transaction(function () {
+        $isInsurance = $this->payer !== 'cash';
+
+        [$invoice, $claim] = DB::transaction(function () use ($isInsurance) {
             $invoice = Invoice::create([
                 'facility_id' => $this->visit->facility_id,
                 'patient_id' => $this->visit->patient_id,
@@ -81,7 +91,7 @@ class Create extends Component
                 'subtotal' => $this->subtotal,
                 'discount' => $this->discount,
                 'total' => $this->total,
-                'payment_method' => $this->payer,
+                'payment_method' => $isInsurance ? 'insurance' : 'cash',
                 'created_by' => Auth::id(),
             ]);
 
@@ -94,11 +104,12 @@ class Create extends Component
                 ]);
             }
 
-            if ($this->payer === 'insurance') {
+            if ($isInsurance) {
                 $claim = $invoice->claim()->create([
                     'facility_id' => $invoice->facility_id,
                     'patient_id' => $invoice->patient_id,
-                    'nhif_card_number' => $this->nhifCardNumber,
+                    'insurer' => $this->payer,
+                    'member_number' => $this->memberNumber,
                     'amount_claimed' => $this->total,
                 ]);
 

@@ -33,6 +33,9 @@ class Create extends Component
     #[Validate('nullable|string|max:30')]
     public string $nhif_card_number = '';
 
+    #[Validate('nullable|string|max:30')]
+    public string $nssf_member_number = '';
+
     #[Validate('nullable|string|max:255')]
     public string $address = '';
 
@@ -58,6 +61,7 @@ class Create extends Component
             'email' => $this->email,
             'national_id' => $this->national_id,
             'nhif_card_number' => $this->nhif_card_number,
+            'nssf_member_number' => $this->nssf_member_number,
             'address' => $this->address,
             'emergency_contact_name' => $this->emergency_contact_name,
             'emergency_contact_phone' => $this->emergency_contact_phone,

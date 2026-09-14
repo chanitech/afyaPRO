@@ -47,6 +47,9 @@
             @if ($patient->nhif_card_number)
                 <div class="meta">NHIF: {{ $patient->nhif_card_number }}</div>
             @endif
+            @if ($patient->nssf_member_number)
+                <div class="meta">NSSF: {{ $patient->nssf_member_number }}</div>
+            @endif
         </div>
         <div>
             <x-barcode :value="$patient->patient_number" />

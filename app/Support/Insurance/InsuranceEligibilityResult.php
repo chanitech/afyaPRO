@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Support\Nhif;
+namespace App\Support\Insurance;
 
-final readonly class NhifEligibilityResult
+final readonly class InsuranceEligibilityResult
 {
     public function __construct(
         public bool $eligible,

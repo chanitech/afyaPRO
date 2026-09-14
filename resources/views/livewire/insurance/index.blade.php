@@ -1,7 +1,7 @@
 <div>
-    <x-adminlte-card title="NHIF Claims" icon="bi bi-shield-check">
-        <div class="mb-3" style="max-width: 16rem;">
-            <select wire:model.live="status" class="form-select">
+    <x-adminlte-card title="Insurance Claims" icon="bi bi-shield-check">
+        <div class="d-flex gap-3 mb-3">
+            <select wire:model.live="status" class="form-select" style="max-width: 16rem;">
                 <option value="">All statuses</option>
                 <option value="pending_eligibility">Pending Eligibility</option>
                 <option value="eligible">Eligible</option>
@@ -10,6 +10,12 @@
                 <option value="approved">Approved</option>
                 <option value="rejected">Rejected</option>
             </select>
+            <select wire:model.live="insurer" class="form-select" style="max-width: 12rem;">
+                <option value="">All insurers</option>
+                @foreach ($insurers as $value => $label)
+                    <option value="{{ $value }}">{{ $label }}</option>
+                @endforeach
+            </select>
         </div>
 
         <div class="table-responsive">
@@ -17,6 +23,7 @@
                 <thead>
                     <tr>
                         <th>Claim No.</th>
+                        <th>Insurer</th>
                         <th>Patient</th>
                         <th>Invoice</th>
                         <th class="text-end">Amount Claimed</th>
@@ -28,6 +35,7 @@
                     @forelse ($claims as $claim)
                         <tr>
                             <td>{{ $claim->claim_number }}</td>
+                            <td>{{ $claim->insurerLabel() }}</td>
                             <td>{{ $claim->patient->fullName() }}</td>
                             <td>{{ $claim->invoice->invoice_number }}</td>
                             <td class="text-end">{{ number_format($claim->amount_claimed, 2) }}</td>
@@ -49,7 +57,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="6" class="text-center text-muted py-4">No NHIF claims yet.</td>
+                            <td colspan="7" class="text-center text-muted py-4">No insurance claims yet.</td>
                         </tr>
                     @endforelse
                 </tbody>

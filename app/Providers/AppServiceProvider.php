@@ -2,8 +2,8 @@
 
 namespace App\Providers;
 
-use App\Support\Nhif\LogNhifGateway;
-use App\Support\Nhif\NhifGateway;
+use App\Support\Insurance\InsuranceGateway;
+use App\Support\Insurance\LogInsuranceGateway;
 use App\Support\Sms\BeemSmsGateway;
 use App\Support\Sms\LogSmsGateway;
 use App\Support\Sms\SmsGateway;
@@ -27,7 +27,7 @@ class AppServiceProvider extends ServiceProvider
             return new LogSmsGateway;
         });
 
-        $this->app->bind(NhifGateway::class, LogNhifGateway::class);
+        $this->app->bind(InsuranceGateway::class, LogInsuranceGateway::class);
     }
 
     /**

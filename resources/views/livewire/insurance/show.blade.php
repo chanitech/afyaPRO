@@ -1,7 +1,7 @@
 <div class="row">
     <div class="col-12 col-lg-8">
         <x-adminlte-card icon="bi bi-shield-check"
-            title="NHIF Claim {{ $claim->claim_number }}">
+            title="{{ $claim->insurerLabel() }} Claim {{ $claim->claim_number }}">
             <x-slot name="tools">
                 <span @class([
                     'badge',
@@ -22,8 +22,8 @@
 
             <div class="row g-3 mb-3">
                 <div class="col-md-6">
-                    <div class="text-muted small">NHIF Card Number</div>
-                    <div class="fw-medium">{{ $claim->nhif_card_number }}</div>
+                    <div class="text-muted small">{{ $claim->insurerLabel() }} Member Number</div>
+                    <div class="fw-medium">{{ $claim->member_number }}</div>
                 </div>
                 <div class="col-md-6">
                     <div class="text-muted small">Scheme</div>
@@ -48,7 +48,7 @@
             <div class="border-top pt-3">
                 @if ($claim->status === 'pending_eligibility')
                     <button type="button" wire:click="checkEligibility" class="btn btn-primary">
-                        Check NHIF Eligibility
+                        Check {{ $claim->insurerLabel() }} Eligibility
                     </button>
                 @elseif ($claim->status === 'not_eligible')
                     <button type="button" wire:click="checkEligibility" class="btn btn-outline-primary">
@@ -56,7 +56,7 @@
                     </button>
                 @elseif ($claim->status === 'eligible')
                     <button type="button" wire:click="submitClaim" class="btn btn-primary">
-                        Submit Claim to NHIF
+                        Submit Claim to {{ $claim->insurerLabel() }}
                     </button>
                 @elseif ($claim->status === 'submitted')
                     <p class="text-muted mb-3">

@@ -68,17 +68,21 @@
                                 <label for="payer_cash" class="form-check-label">Cash</label>
                             </div>
                             <div class="form-check">
-                                <input type="radio" wire:model.live="payer" value="insurance" id="payer_insurance" class="form-check-input">
-                                <label for="payer_insurance" class="form-check-label">NHIF</label>
+                                <input type="radio" wire:model.live="payer" value="nhif" id="payer_nhif" class="form-check-input">
+                                <label for="payer_nhif" class="form-check-label">NHIF</label>
+                            </div>
+                            <div class="form-check">
+                                <input type="radio" wire:model.live="payer" value="nssf" id="payer_nssf" class="form-check-input">
+                                <label for="payer_nssf" class="form-check-label">NSSF (SHIB)</label>
                             </div>
                         </div>
                     </div>
 
-                    @if ($payer === 'insurance')
+                    @if ($payer !== 'cash')
                         <div class="mt-3">
-                            <x-input-label for="nhifCardNumber" value="NHIF card number" />
-                            <x-text-input wire:model="nhifCardNumber" id="nhifCardNumber" style="max-width: 16rem;" />
-                            <x-input-error :messages="$errors->get('nhifCardNumber')" class="mt-1" />
+                            <x-input-label for="memberNumber" :value="$payer === 'nssf' ? 'NSSF member number' : 'NHIF card number'" />
+                            <x-text-input wire:model="memberNumber" id="memberNumber" style="max-width: 16rem;" />
+                            <x-input-error :messages="$errors->get('memberNumber')" class="mt-1" />
                             <p class="form-text">Eligibility will be checked after the invoice is created.</p>
                         </div>
                     @else

@@ -48,6 +48,10 @@
                         <x-input-label for="nhif_card_number" value="NHIF card number" />
                         <x-text-input wire:model="nhif_card_number" id="nhif_card_number" />
                     </div>
+                    <div class="col-md-6">
+                        <x-input-label for="nssf_member_number" value="NSSF member number" />
+                        <x-text-input wire:model="nssf_member_number" id="nssf_member_number" />
+                    </div>
 
                     <div class="col-md-6">
                         <x-input-label for="blood_group" value="Blood group" />

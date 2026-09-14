@@ -12,8 +12,8 @@ use Illuminate\Support\Str;
 
 #[Fillable([
     'facility_id', 'patient_number', 'first_name', 'last_name', 'date_of_birth', 'sex',
-    'phone', 'email', 'national_id', 'nhif_card_number', 'address', 'emergency_contact_name',
-    'emergency_contact_phone', 'blood_group', 'registered_by',
+    'phone', 'email', 'national_id', 'nhif_card_number', 'nssf_member_number', 'address',
+    'emergency_contact_name', 'emergency_contact_phone', 'blood_group', 'registered_by',
 ])]
 class Patient extends Model
 {

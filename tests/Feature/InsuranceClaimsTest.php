@@ -27,7 +27,11 @@ class InsuranceClaimsTest extends TestCase
         $department = Department::create(['facility_id' => $facility->id, 'name' => 'General OPD', 'code' => 'OPD']);
         $doctor = User::factory()->create(['facility_id' => $facility->id]);
         $doctor->assignRole('doctor');
-        $patient = Patient::factory()->create(['facility_id' => $facility->id, 'nhif_card_number' => '1234567890']);
+        $patient = Patient::factory()->create([
+            'facility_id' => $facility->id,
+            'nhif_card_number' => '1234567890',
+            'nssf_member_number' => 'NSSF-000111',
+        ]);
         $receptionist = User::factory()->create(['facility_id' => $facility->id]);
         $receptionist->assignRole('receptionist');
 
@@ -52,8 +56,8 @@ class InsuranceClaimsTest extends TestCase
             ->set('items.0.description', 'Consultation fee')
             ->set('items.0.quantity', 1)
             ->set('items.0.unit_price', 10000)
-            ->set('payer', 'insurance')
-            ->set('nhifCardNumber', '1234567890')
+            ->set('payer', 'nhif')
+            ->set('memberNumber', '1234567890')
             ->call('save')
             ->assertRedirect();
 
@@ -64,13 +68,38 @@ class InsuranceClaimsTest extends TestCase
 
         $this->assertDatabaseHas('insurance_claims', [
             'patient_id' => $visit->patient_id,
-            'nhif_card_number' => '1234567890',
+            'insurer' => 'nhif',
+            'member_number' => '1234567890',
             'status' => 'pending_eligibility',
             'amount_claimed' => 10000,
         ]);
     }
 
-    public function test_eligibility_check_marks_a_valid_card_eligible(): void
+    public function test_billing_creates_a_pending_claim_when_nssf_is_chosen_as_payer(): void
+    {
+        $visit = $this->makeVisit();
+        $receptionist = User::where('facility_id', $visit->facility_id)->role('receptionist')->firstOrFail();
+
+        Livewire::actingAs($receptionist)
+            ->test(BillingCreate::class, ['visit' => $visit])
+            ->set('items.0.description', 'Consultation fee')
+            ->set('items.0.quantity', 1)
+            ->set('items.0.unit_price', 15000)
+            ->set('payer', 'nssf')
+            ->set('memberNumber', 'NSSF-000111')
+            ->call('save')
+            ->assertRedirect();
+
+        $this->assertDatabaseHas('insurance_claims', [
+            'patient_id' => $visit->patient_id,
+            'insurer' => 'nssf',
+            'member_number' => 'NSSF-000111',
+            'status' => 'pending_eligibility',
+            'amount_claimed' => 15000,
+        ]);
+    }
+
+    public function test_eligibility_check_marks_a_valid_nhif_card_eligible(): void
     {
         $visit = $this->makeVisit();
         $invoice = $visit->patient->invoices()->create([
@@ -82,7 +111,8 @@ class InsuranceClaimsTest extends TestCase
         $claim = $invoice->claim()->create([
             'facility_id' => $visit->facility_id,
             'patient_id' => $visit->patient_id,
-            'nhif_card_number' => '1234567890',
+            'insurer' => 'nhif',
+            'member_number' => '1234567890',
             'amount_claimed' => 10000,
         ]);
 
@@ -100,7 +130,38 @@ class InsuranceClaimsTest extends TestCase
         ]);
     }
 
-    public function test_eligibility_check_rejects_a_malformed_card_number(): void
+    public function test_eligibility_check_marks_a_valid_nssf_member_eligible(): void
+    {
+        $visit = $this->makeVisit();
+        $invoice = $visit->patient->invoices()->create([
+            'facility_id' => $visit->facility_id,
+            'opd_visit_id' => $visit->id,
+            'total' => 15000,
+            'payment_method' => 'insurance',
+        ]);
+        $claim = $invoice->claim()->create([
+            'facility_id' => $visit->facility_id,
+            'patient_id' => $visit->patient_id,
+            'insurer' => 'nssf',
+            'member_number' => 'NSSF-000111',
+            'amount_claimed' => 15000,
+        ]);
+
+        $officer = User::factory()->create(['facility_id' => $visit->facility_id]);
+        $officer->assignRole('insurance-officer');
+
+        Livewire::actingAs($officer)
+            ->test(InsuranceShow::class, ['claim' => $claim])
+            ->call('checkEligibility');
+
+        $this->assertDatabaseHas('insurance_claims', [
+            'id' => $claim->id,
+            'status' => 'eligible',
+            'scheme_name' => 'NSSF Social Health Insurance Benefit (SHIB)',
+        ]);
+    }
+
+    public function test_eligibility_check_rejects_a_malformed_member_number(): void
     {
         $visit = $this->makeVisit();
         $invoice = $visit->patient->invoices()->create([
@@ -112,7 +173,8 @@ class InsuranceClaimsTest extends TestCase
         $claim = $invoice->claim()->create([
             'facility_id' => $visit->facility_id,
             'patient_id' => $visit->patient_id,
-            'nhif_card_number' => 'not-a-card',
+            'insurer' => 'nhif',
+            'member_number' => 'x',
             'amount_claimed' => 10000,
         ]);
 
@@ -138,7 +200,8 @@ class InsuranceClaimsTest extends TestCase
         $claim = $invoice->claim()->create([
             'facility_id' => $visit->facility_id,
             'patient_id' => $visit->patient_id,
-            'nhif_card_number' => '1234567890',
+            'insurer' => 'nhif',
+            'member_number' => '1234567890',
             'amount_claimed' => 10000,
             'status' => 'eligible',
             'scheme_name' => 'NHIF Standard Scheme',
@@ -183,7 +246,8 @@ class InsuranceClaimsTest extends TestCase
         $claim = $invoice->claim()->create([
             'facility_id' => $visit->facility_id,
             'patient_id' => $visit->patient_id,
-            'nhif_card_number' => '1234567890',
+            'insurer' => 'nhif',
+            'member_number' => '1234567890',
             'amount_claimed' => 10000,
             'status' => 'submitted',
             'submitted_at' => now(),
@@ -228,7 +292,8 @@ class InsuranceClaimsTest extends TestCase
         $claim = $invoice->claim()->create([
             'facility_id' => $visit->facility_id,
             'patient_id' => $visit->patient_id,
-            'nhif_card_number' => '1234567890',
+            'insurer' => 'nhif',
+            'member_number' => '1234567890',
             'amount_claimed' => 10000,
         ]);
 
@@ -242,7 +307,8 @@ class InsuranceClaimsTest extends TestCase
         $otherFacilityClaim = $otherInvoice->claim()->create([
             'facility_id' => $otherFacility->id,
             'patient_id' => $otherPatient->id,
-            'nhif_card_number' => '9999999999',
+            'insurer' => 'nhif',
+            'member_number' => '9999999999',
             'amount_claimed' => 5000,
         ]);
 
@@ -253,5 +319,34 @@ class InsuranceClaimsTest extends TestCase
             ->test(InsuranceIndex::class)
             ->assertSee($claim->claim_number)
             ->assertDontSee($otherFacilityClaim->claim_number);
+    }
+
+    public function test_index_can_filter_by_insurer(): void
+    {
+        $visit = $this->makeVisit();
+        $invoice1 = $visit->patient->invoices()->create([
+            'facility_id' => $visit->facility_id, 'opd_visit_id' => $visit->id, 'total' => 10000, 'payment_method' => 'insurance',
+        ]);
+        $nhifClaim = $invoice1->claim()->create([
+            'facility_id' => $visit->facility_id, 'patient_id' => $visit->patient_id,
+            'insurer' => 'nhif', 'member_number' => '1234567890', 'amount_claimed' => 10000,
+        ]);
+
+        $invoice2 = $visit->patient->invoices()->create([
+            'facility_id' => $visit->facility_id, 'total' => 15000, 'payment_method' => 'insurance',
+        ]);
+        $nssfClaim = $invoice2->claim()->create([
+            'facility_id' => $visit->facility_id, 'patient_id' => $visit->patient_id,
+            'insurer' => 'nssf', 'member_number' => 'NSSF-000111', 'amount_claimed' => 15000,
+        ]);
+
+        $officer = User::factory()->create(['facility_id' => $visit->facility_id]);
+        $officer->assignRole('insurance-officer');
+
+        Livewire::actingAs($officer)
+            ->test(InsuranceIndex::class)
+            ->set('insurer', 'nssf')
+            ->assertSee($nssfClaim->claim_number)
+            ->assertDontSee($nhifClaim->claim_number);
     }
 }
