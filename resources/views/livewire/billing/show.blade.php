@@ -13,7 +13,17 @@
                 </span>
             </x-slot>
 
-            <p class="text-muted mb-3">{{ $invoice->patient->fullName() }} &middot; {{ $invoice->patient->patient_number }}</p>
+            <p class="text-muted mb-3">
+                {{ $invoice->patient->fullName() }} &middot; {{ $invoice->patient->patient_number }}
+                &middot; {{ $invoice->payment_method === 'insurance' ? 'NHIF' : 'Cash' }}
+            </p>
+
+            @if ($invoice->claim)
+                <x-adminlte-alert theme="info" icon="bi bi-shield-check" class="mb-3">
+                    NHIF claim {{ $invoice->claim->claim_number }} is <strong>{{ str($invoice->claim->status)->headline() }}</strong>.
+                    <a href="{{ route('insurance.show', ['claim' => $invoice->claim->id]) }}" wire:navigate>View claim</a>
+                </x-adminlte-alert>
+            @endif
 
             <div class="table-responsive mb-3">
                 <table class="table align-middle">
@@ -46,7 +56,7 @@
                 <div class="d-flex justify-content-between fw-semibold"><span>Balance Due</span><span>{{ number_format($invoice->balanceDue(), 2) }}</span></div>
             </div>
 
-            @if ($invoice->balanceDue() > 0)
+            @if ($invoice->balanceDue() > 0 && $invoice->payment_method !== 'insurance')
                 <form wire:submit="recordPayment" class="d-flex align-items-end gap-3 border-top pt-3 mt-3">
                     <div class="flex-grow-1">
                         <x-input-label for="paymentAmount" value="Record cash payment" />

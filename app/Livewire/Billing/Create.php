@@ -24,9 +24,16 @@ class Create extends Component
     #[Validate('numeric|min:0')]
     public string $amountReceived = '0';
 
+    #[Validate('in:cash,insurance')]
+    public string $payer = 'cash';
+
+    #[Validate('nullable|string|max:30')]
+    public string $nhifCardNumber = '';
+
     public function mount(OpdVisit $visit): void
     {
         $this->visit = $visit->loadMissing('patient');
+        $this->nhifCardNumber = $this->visit->patient->nhif_card_number ?? '';
 
         if ($this->visit->invoice) {
             $this->redirect(route('billing.show', ['invoice' => $this->visit->invoice->id]), navigate: true);
@@ -62,9 +69,11 @@ class Create extends Component
             'items.*.unit_price' => 'required|numeric|min:0',
             'discount' => 'numeric|min:0',
             'amountReceived' => 'numeric|min:0',
+            'payer' => 'in:cash,insurance',
+            'nhifCardNumber' => $this->payer === 'insurance' ? 'required|string|max:30' : 'nullable|string|max:30',
         ]);
 
-        $invoice = DB::transaction(function () {
+        [$invoice, $claim] = DB::transaction(function () {
             $invoice = Invoice::create([
                 'facility_id' => $this->visit->facility_id,
                 'patient_id' => $this->visit->patient_id,
@@ -72,7 +81,7 @@ class Create extends Component
                 'subtotal' => $this->subtotal,
                 'discount' => $this->discount,
                 'total' => $this->total,
-                'payment_method' => 'cash',
+                'payment_method' => $this->payer,
                 'created_by' => Auth::id(),
             ]);
 
@@ -85,6 +94,17 @@ class Create extends Component
                 ]);
             }
 
+            if ($this->payer === 'insurance') {
+                $claim = $invoice->claim()->create([
+                    'facility_id' => $invoice->facility_id,
+                    'patient_id' => $invoice->patient_id,
+                    'nhif_card_number' => $this->nhifCardNumber,
+                    'amount_claimed' => $this->total,
+                ]);
+
+                return [$invoice, $claim];
+            }
+
             if ((float) $this->amountReceived > 0) {
                 $invoice->payments()->create([
                     'amount' => min((float) $this->amountReceived, $this->total),
@@ -94,8 +114,12 @@ class Create extends Component
                 ]);
             }
 
-            return $invoice;
+            return [$invoice, null];
         });
+
+        if ($claim) {
+            return $this->redirect(route('insurance.show', ['claim' => $claim->id]), navigate: true);
+        }
 
         return $this->redirect(route('billing.show', ['invoice' => $invoice->id]), navigate: true);
     }

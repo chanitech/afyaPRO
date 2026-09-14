@@ -16,7 +16,7 @@ class Show extends Component
 
     public function mount(Invoice $invoice): void
     {
-        $this->invoice = $invoice->load(['patient', 'items', 'payments']);
+        $this->invoice = $invoice->load(['patient', 'items', 'payments', 'claim']);
     }
 
     public function recordPayment(): void

@@ -59,10 +59,34 @@
                         <span>Total Due</span>
                         <span>{{ number_format($this->total, 2) }}</span>
                     </div>
-                    <div class="d-flex align-items-center justify-content-between mt-3">
-                        <span class="text-muted">Cash received now</span>
-                        <x-text-input type="number" min="0" step="0.01" wire:model="amountReceived" class="w-auto text-end" style="max-width: 8rem;" />
+
+                    <div class="mt-3">
+                        <x-input-label value="Payer" />
+                        <div class="d-flex gap-4">
+                            <div class="form-check">
+                                <input type="radio" wire:model.live="payer" value="cash" id="payer_cash" class="form-check-input">
+                                <label for="payer_cash" class="form-check-label">Cash</label>
+                            </div>
+                            <div class="form-check">
+                                <input type="radio" wire:model.live="payer" value="insurance" id="payer_insurance" class="form-check-input">
+                                <label for="payer_insurance" class="form-check-label">NHIF</label>
+                            </div>
+                        </div>
                     </div>
+
+                    @if ($payer === 'insurance')
+                        <div class="mt-3">
+                            <x-input-label for="nhifCardNumber" value="NHIF card number" />
+                            <x-text-input wire:model="nhifCardNumber" id="nhifCardNumber" style="max-width: 16rem;" />
+                            <x-input-error :messages="$errors->get('nhifCardNumber')" class="mt-1" />
+                            <p class="form-text">Eligibility will be checked after the invoice is created.</p>
+                        </div>
+                    @else
+                        <div class="d-flex align-items-center justify-content-between mt-3">
+                            <span class="text-muted">Cash received now</span>
+                            <x-text-input type="number" min="0" step="0.01" wire:model="amountReceived" class="w-auto text-end" style="max-width: 8rem;" />
+                        </div>
+                    @endif
                 </div>
 
                 <div class="d-flex justify-content-end mt-4">

@@ -306,6 +306,13 @@ return [
             'can' => 'billing.manage',
             'active' => ['billing*'],
         ],
+        [
+            'text' => 'NHIF Claims',
+            'route' => 'insurance.index',
+            'icon' => 'bi bi-shield-check',
+            'can' => 'insurance.manage',
+            'active' => ['insurance*'],
+        ],
     ],
 
     /*

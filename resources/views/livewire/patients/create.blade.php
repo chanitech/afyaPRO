@@ -45,6 +45,11 @@
                         <x-text-input wire:model="national_id" id="national_id" />
                     </div>
                     <div class="col-md-6">
+                        <x-input-label for="nhif_card_number" value="NHIF card number" />
+                        <x-text-input wire:model="nhif_card_number" id="nhif_card_number" />
+                    </div>
+
+                    <div class="col-md-6">
                         <x-input-label for="blood_group" value="Blood group" />
                         <x-text-input wire:model="blood_group" id="blood_group" placeholder="O+" />
                     </div>

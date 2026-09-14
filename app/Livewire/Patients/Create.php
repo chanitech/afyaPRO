@@ -30,6 +30,9 @@ class Create extends Component
     #[Validate('nullable|string|max:30')]
     public string $national_id = '';
 
+    #[Validate('nullable|string|max:30')]
+    public string $nhif_card_number = '';
+
     #[Validate('nullable|string|max:255')]
     public string $address = '';
 
@@ -54,6 +57,7 @@ class Create extends Component
             'phone' => $this->phone,
             'email' => $this->email,
             'national_id' => $this->national_id,
+            'nhif_card_number' => $this->nhif_card_number,
             'address' => $this->address,
             'emergency_contact_name' => $this->emergency_contact_name,
             'emergency_contact_phone' => $this->emergency_contact_phone,

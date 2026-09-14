@@ -11,6 +11,8 @@ use App\Livewire\Diagnostics\Show as DiagnosticsShow;
 use App\Livewire\Inpatient\Admit as InpatientAdmit;
 use App\Livewire\Inpatient\Board as InpatientBoard;
 use App\Livewire\Inpatient\Wards as InpatientWards;
+use App\Livewire\Insurance\Index as InsuranceIndex;
+use App\Livewire\Insurance\Show as InsuranceShow;
 use App\Livewire\Opd\Consultation;
 use App\Livewire\Patients\Create as PatientsCreate;
 use App\Livewire\Patients\Index as PatientsIndex;
@@ -54,6 +56,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('billing', BillingPending::class)->name('billing.pending');
         Route::get('billing/visits/{visit}/create', BillingCreate::class)->name('billing.create');
         Route::get('billing/invoices/{invoice}', BillingShow::class)->name('billing.show');
+    });
+
+    Route::middleware('permission:insurance.manage')->group(function () {
+        Route::get('insurance', InsuranceIndex::class)->name('insurance.index');
+        Route::get('insurance/claims/{claim}', InsuranceShow::class)->name('insurance.show');
     });
 
     Route::middleware('permission:diagnostics.manage')->group(function () {

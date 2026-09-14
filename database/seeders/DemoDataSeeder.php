@@ -99,6 +99,18 @@ class DemoDataSeeder extends Seeder
         );
         $nurse->syncRoles(['nurse']);
 
+        $insuranceOfficer = User::firstOrCreate(
+            ['email' => 'nhif@afyapro.test'],
+            [
+                'name' => 'Zainab Rashidi',
+                'facility_id' => $facility->id,
+                'phone' => '+255700000006',
+                'password' => Hash::make('password'),
+                'email_verified_at' => now(),
+            ]
+        );
+        $insuranceOfficer->syncRoles(['insurance-officer']);
+
         if (Patient::where('facility_id', $facility->id)->count() === 0) {
             Patient::factory()
                 ->count(5)
