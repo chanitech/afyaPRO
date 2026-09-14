@@ -313,6 +313,13 @@ return [
             'can' => 'insurance.manage',
             'active' => ['insurance*'],
         ],
+        [
+            'text' => 'Reports',
+            'route' => 'reports.dashboard',
+            'icon' => 'bi bi-graph-up',
+            'can' => 'reports.manage',
+            'active' => ['reports*'],
+        ],
     ],
 
     /*

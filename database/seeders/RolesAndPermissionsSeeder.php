@@ -18,6 +18,7 @@ class RolesAndPermissionsSeeder extends Seeder
         'diagnostics.manage',
         'pharmacy.manage',
         'inpatient.manage',
+        'reports.manage',
         'users.manage',
         'facilities.manage',
     ];

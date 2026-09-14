@@ -23,6 +23,7 @@ use App\Livewire\Pharmacy\Pending as PharmacyPending;
 use App\Livewire\Pharmacy\Prescribe as PharmacyPrescribe;
 use App\Livewire\Pharmacy\Show as PharmacyShow;
 use App\Livewire\Queue\Board as QueueBoard;
+use App\Livewire\Reports\Dashboard as ReportsDashboard;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', fn () => auth()->check() ? redirect()->route('dashboard') : redirect()->route('login'));
@@ -84,6 +85,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('inpatient', InpatientBoard::class)->name('inpatient.board');
         Route::get('inpatient/wards', InpatientWards::class)->name('inpatient.wards');
         Route::get('inpatient/visits/{visit}/admit', InpatientAdmit::class)->name('inpatient.admit');
+    });
+
+    Route::middleware('permission:reports.manage')->group(function () {
+        Route::get('reports', ReportsDashboard::class)->name('reports.dashboard');
     });
 });
 
