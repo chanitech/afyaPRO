@@ -132,7 +132,7 @@ class Consultation extends Component
         $departments = Department::where('facility_id', Auth::user()->facility_id)->orderBy('name')->get();
 
         $activeVisit = $this->activeVisitId
-            ? OpdVisit::with(['patient', 'diagnosticOrders.items.test', 'prescriptions.items.drug', 'admission.ward', 'admission.bed'])->find($this->activeVisitId)
+            ? OpdVisit::with(['patient', 'diagnosticOrders.items.test', 'prescriptions.items.drug', 'admission.ward', 'admission.bed', 'delivery'])->find($this->activeVisitId)
             : null;
 
         return view('livewire.opd.consultation', compact('inService', 'departments', 'activeVisit'));

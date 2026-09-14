@@ -18,6 +18,7 @@ class RolesAndPermissionsSeeder extends Seeder
         'diagnostics.manage',
         'pharmacy.manage',
         'inpatient.manage',
+        'maternity.manage',
         'reports.manage',
         'users.manage',
         'facilities.manage',
@@ -26,8 +27,8 @@ class RolesAndPermissionsSeeder extends Seeder
     public const ROLES = [
         'admin' => self::PERMISSIONS,
         'receptionist' => ['patients.manage', 'appointments.manage', 'queue.manage', 'billing.manage', 'insurance.manage'],
-        'doctor' => ['queue.manage', 'opd.manage', 'diagnostics.manage', 'pharmacy.manage', 'inpatient.manage'],
-        'nurse' => ['queue.manage', 'opd.manage', 'diagnostics.manage', 'pharmacy.manage', 'inpatient.manage'],
+        'doctor' => ['queue.manage', 'opd.manage', 'diagnostics.manage', 'pharmacy.manage', 'inpatient.manage', 'maternity.manage'],
+        'nurse' => ['queue.manage', 'opd.manage', 'diagnostics.manage', 'pharmacy.manage', 'inpatient.manage', 'maternity.manage'],
         'lab-tech' => ['diagnostics.manage'],
         'pharmacist' => ['pharmacy.manage'],
         'insurance-officer' => ['billing.manage', 'insurance.manage'],

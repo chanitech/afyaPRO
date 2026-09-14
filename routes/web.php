@@ -13,6 +13,10 @@ use App\Livewire\Inpatient\Board as InpatientBoard;
 use App\Livewire\Inpatient\Wards as InpatientWards;
 use App\Livewire\Insurance\Index as InsuranceIndex;
 use App\Livewire\Insurance\Show as InsuranceShow;
+use App\Livewire\Maternity\Admit as MaternityAdmit;
+use App\Livewire\Maternity\Board as MaternityBoard;
+use App\Livewire\Maternity\Deliver as MaternityDeliver;
+use App\Livewire\Maternity\Partograph as MaternityPartograph;
 use App\Livewire\Opd\Consultation;
 use App\Livewire\Patients\Create as PatientsCreate;
 use App\Livewire\Patients\IdCard as PatientsIdCard;
@@ -89,6 +93,13 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::middleware('permission:reports.manage')->group(function () {
         Route::get('reports', ReportsDashboard::class)->name('reports.dashboard');
+    });
+
+    Route::middleware('permission:maternity.manage')->group(function () {
+        Route::get('maternity', MaternityBoard::class)->name('maternity.board');
+        Route::get('maternity/visits/{visit}/admit', MaternityAdmit::class)->name('maternity.admit');
+        Route::get('maternity/deliveries/{delivery}/partograph', MaternityPartograph::class)->name('maternity.partograph');
+        Route::get('maternity/deliveries/{delivery}/deliver', MaternityDeliver::class)->name('maternity.deliver');
     });
 });
 

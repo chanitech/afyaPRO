@@ -55,6 +55,11 @@
                                 <i class="bi bi-hospital"></i> Admit to Ward
                             </a>
                         @endif
+                        @if (! $activeVisit->delivery)
+                            <a href="{{ route('maternity.admit', ['visit' => $activeVisit->id]) }}" wire:navigate class="btn btn-outline-primary btn-sm">
+                                <i class="bi bi-heart-pulse-fill"></i> Start Labour
+                            </a>
+                        @endif
                     </x-slot>
 
                     @if ($activeVisit->admission)
@@ -67,6 +72,20 @@
                                 <span class="badge text-bg-secondary">Discharged</span>
                             @else
                                 <span class="badge text-bg-success">Admitted</span>
+                            @endif
+                        </div>
+                    @endif
+
+                    @if ($activeVisit->delivery)
+                        <div class="alert alert-info d-flex align-items-center justify-content-between mb-3">
+                            <span>
+                                <i class="bi bi-heart-pulse-fill me-1"></i>
+                                <a href="{{ route('maternity.partograph', ['delivery' => $activeVisit->delivery->id]) }}" wire:navigate>View Partograph</a>
+                            </span>
+                            @if ($activeVisit->delivery->status === 'delivered')
+                                <span class="badge text-bg-success">Delivered</span>
+                            @else
+                                <span class="badge text-bg-warning">In Labour</span>
                             @endif
                         </div>
                     @endif

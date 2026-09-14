@@ -300,6 +300,13 @@ return [
             'active' => ['inpatient*'],
         ],
         [
+            'text' => 'Maternity',
+            'route' => 'maternity.board',
+            'icon' => 'bi bi-heart-pulse-fill',
+            'can' => 'maternity.manage',
+            'active' => ['maternity*'],
+        ],
+        [
             'text' => 'Billing',
             'route' => 'billing.pending',
             'icon' => 'bi bi-receipt',

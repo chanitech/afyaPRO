@@ -76,6 +76,11 @@ class Patient extends Model
         return $this->hasMany(InsuranceClaim::class);
     }
 
+    public function deliveries(): HasMany
+    {
+        return $this->hasMany(Delivery::class);
+    }
+
     public function fullName(): string
     {
         return trim("{$this->first_name} {$this->last_name}");
